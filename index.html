@@ -3,271 +3,63 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Deriv Matches / Differs — Live Analyzer V4</title>
+<title>Deriv Matches / Differs — Live Analyzer</title>
 <style>
-*{box-sizing:border-box}body{margin:0;background:#061120;color:#eaf2ff;font-family:Arial,sans-serif}
-.wrap{max-width:760px;margin:auto;padding:22px}.card{background:#0b1b2d;border:1px solid #1b3855;border-radius:18px;padding:20px;margin:14px 0}
-h1{font-size:28px;margin:0 0 8px}.sub{color:#9db2cc;line-height:1.45}.status{font-weight:700;margin:14px 0}.dot{display:inline-block;width:11px;height:11px;border-radius:50%;background:#e34b64;margin-right:8px}.ok{background:#35c77a}.warn{background:#f3b63f}
-label{display:block;color:#9db2cc;margin:14px 0 7px}select,input,button{width:100%;padding:15px;border-radius:13px;border:1px solid #24435f;background:#081729;color:#eaf2ff;font-size:16px}
-button{background:#6ca5ff;color:#061120;border:0;font-weight:800;margin-top:14px}.secondary{background:#132b45;color:#b9cbe0}.grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}.metric{background:#081729;border:1px solid #193650;border-radius:13px;padding:14px}.metric small{display:block;color:#91a9c3}.metric b{font-size:24px;display:block;margin-top:5px}
-.signal{font-size:25px;font-weight:900;padding:18px;border-radius:14px;text-align:center;background:#132b45}.match{background:#123a2b}.diff{background:#40232a}.neutral{background:#132b45}
-.seq{word-break:break-all;line-height:1.8;color:#c9d8e8}.note{font-size:13px;color:#8fa6bf;line-height:1.5}
-
-#allDist{line-height:1.9}.wrow{display:flex;justify-content:space-between;gap:10px;padding:11px;margin:7px 0;border:1px solid #193650;background:#081729;border-radius:12px}.good{color:#6fe0a0}.bad{color:#ff8194}.muted{color:#91a9c3}.bar{height:9px;background:#284a68;border-radius:9px;margin-top:3px}.bar span{display:block;height:100%;background:#6ca5ff;border-radius:9px}
+body{margin:0;background:#061120;color:#eaf2ff;font-family:Arial,sans-serif}.wrap{max-width:760px;margin:auto;padding:18px}.card{background:#0b1b2d;border:1px solid #1b3855;border-radius:18px;padding:18px;margin:14px 0}h1{font-size:26px}.sub,.note{color:#9db2cc;line-height:1.45}.dot{display:inline-block;width:11px;height:11px;border-radius:50%;background:#e34b64;margin-right:8px}.ok{background:#35c77a}.warn{background:#f3b63f}select,button{width:100%;padding:14px;margin:6px 0;border-radius:13px;border:1px solid #24435f;background:#081729;color:#eaf2ff;font-size:16px}button{background:#6ca5ff;color:#061120;font-weight:800}.secondary{background:#132b45;color:#b9cbe0}.grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}.metric{background:#081729;border:1px solid #193650;border-radius:13px;padding:13px}.metric small{display:block;color:#91a9c3}.metric b{font-size:23px}.signal{text-align:center;font-size:23px;font-weight:900;padding:17px;border-radius:14px;background:#132b45}.match{background:#123a2b}.diff{background:#40232a}.seq{word-break:break-all;line-height:1.8}.row{display:flex;justify-content:space-between;gap:8px;padding:10px;margin:6px 0;background:#081729;border:1px solid #193650;border-radius:10px}.good{color:#6fe0a0}.bad{color:#ff8194}.muted{color:#91a9c3}.bar{height:8px;background:#284a68;border-radius:8px}.bar span{display:block;height:100%;background:#6ca5ff;border-radius:8px}
 </style>
 </head>
-<body>
-<div class="wrap">
+<body><div class="wrap">
 <h1>Deriv Matches / Differs — Live Analyzer</h1>
-<div class="sub">Real-time tick stream • digit distribution • streaks • statistical signal</div>
-<div class="status"><span id="dot" class="dot"></span><span id="status">Disconnected</span></div><div id="diagnostic" class="note">Ready.</div>
-
+<div class="sub">Real-time tick stream • statistical analysis • no trade execution</div>
+<p><span id="dot" class="dot"></span><b id="status">Disconnected</b></p>
+<div id="diagnostic" class="note">Ready.</div>
 <div class="card">
-<h2>Connection & Analysis</h2>
-<label>Symbol</label>
-<select id="symbol">
-<option value="auto">Volatility 50 Index (auto-detect)</option>
-<option value="R_10">Volatility 10 Index</option>
-<option value="R_25">Volatility 25 Index</option>
-<option value="R_50">Volatility 50 Index</option>
-<option value="R_75">Volatility 75 Index</option>
-<option value="R_100">Volatility 100 Index</option>
-</select>
-<label>Window (ticks)</label>
+<h2>Connection</h2>
+<select id="symbol"><option value="R_50">Volatility 50 Index</option><option value="R_10">Volatility 10 Index</option><option value="R_25">Volatility 25 Index</option><option value="R_75">Volatility 75 Index</option><option value="R_100">Volatility 100 Index</option></select>
 <select id="window"><option>25</option><option>50</option><option selected>100</option><option>250</option></select>
-<label>Target digit</label>
 <select id="target"></select>
-<button id="connect">Connect & Analyze</button>
-<button id="disconnect" class="secondary">Disconnect</button>
-<div class="note">No App ID, password, API token, or account login is required. The analyzer reads public tick data only.</div>
+<button id="connect">Connect & Analyze</button><button id="disconnect" class="secondary">Disconnect</button>
+<p class="note">Public tick data only. No login, balance access, or trade placement.</p>
 </div>
-
-<div class="card">
-<div class="grid">
+<div class="card"><div class="grid">
 <div class="metric"><small>Ticks received</small><b id="ticks">0</b></div>
 <div class="metric"><small>Current digit</small><b id="digit">—</b></div>
 <div class="metric"><small>Matches</small><b id="matches">0</b></div>
 <div class="metric"><small>Differs</small><b id="differs">0</b></div>
 <div class="metric"><small>Match %</small><b id="matchpct">—</b></div>
 <div class="metric"><small>Differ %</small><b id="diffpct">—</b></div>
+</div></div>
+<div class="card"><h2>Signal</h2><div id="signal" class="signal">WAITING FOR TICKS</div><p id="explain" class="note">A selected digit has a roughly 10% baseline. High Differ % alone is normal.</p></div>
+<div class="card"><h2>25 / 50 / 100 Tick Agreement</h2><div id="windows">Waiting…</div></div>
+<div class="card"><h2>All-Digit Distribution</h2><div id="allDist">Waiting…</div></div>
+<div class="card"><h2>Statistical Strength</h2><div class="grid">
+<div class="metric"><small>Expected target</small><b>10.0%</b></div><div class="metric"><small>Observed target</small><b id="observed">—</b></div>
+<div class="metric"><small>Deviation</small><b id="deviation">—</b></div><div class="metric"><small>Agreement</small><b id="agreement">—</b></div>
+</div></div>
+<div class="card"><h2>Recent Digits</h2><div id="recent" class="seq">—</div></div>
 </div>
-</div>
-
-<div class="card">
-<h2>Signal</h2>
-<div id="signal" class="signal neutral">WAITING FOR TICKS</div>
-<p id="explain" class="note">Collecting data. The signal is a statistical reading of the selected window, not a guarantee of the next outcome.</p>
-</div>
-
-<div class="card">
-<h2>Digit Distribution</h2>
-<div id="dist" class="seq">No ticks yet.</div>
-</div>
-
-
-<div class="card">
-<h2>25 / 50 / 100 Tick Agreement</h2>
-<div id="windows">Waiting for data…</div>
-</div>
-<div class="card">
-<h2>All-Digit Distribution</h2>
-<div id="allDist">Waiting for data…</div>
-</div>
-<div class="card">
-<h2>Statistical Strength</h2>
-<div class="grid">
-<div class="metric"><small>Expected target</small><b>10.0%</b></div>
-<div class="metric"><small>Observed target</small><b id="observed">—</b></div>
-<div class="metric"><small>Deviation</small><b id="deviation">—</b></div>
-<div class="metric"><small>Agreement</small><b id="agreement">—</b></div>
-</div>
-</div>
-<div class="card">
-<h2>Recent Digits</h2>
-<div id="recent" class="seq">—</div>
-</div>
-</div>
-
 <script>
 const WS_URL='wss://ws.binaryws.com/websockets/v3';
-let ws=null, manual=false, timer=null, reconnects=0, currentSymbol=null;
-let ticks=[], total=0, matchCount=0, diffCount=0;
-
-for(let i=0;i<10;i++){let o=document.createElement('option');o.value=i;o.textContent=i;document.getElementById('target').appendChild(o)}
+let ws=null,manual=false,timer=null,reconnects=0,historyDigits=[],liveTicks=0,currentSymbol='R_50';
 const $=id=>document.getElementById(id);
-function setStatus(s,type=''){ $('status').textContent=s; $('dot').className='dot '+type; }
-function digitFromQuote(q){
-  let s=String(q);
-  if(s.includes('e')) s=Number(q).toFixed(8);
-  let a=s.split('.');
-  let frac=a[1]||'';
-  if(!frac) return Number(s.slice(-1));
-  return Number(frac.slice(-1));
-}
-function digitFromQuoteWithPip(q,pip){
-  if(Number.isFinite(Number(pip))){
-    const n=Number(q);
-    const places=Math.max(0,Math.min(10,Number(pip)));
-    const s=n.toFixed(places);
-    const frac=s.split('.')[1]||'';
-    return Number(frac.slice(-1) || s.slice(-1));
-  }
-  return digitFromQuote(q);
-}
-function reset(){
-  ticks=[];total=0;matchCount=0;diffCount=0;
-  ['ticks','matches','differs'].forEach(x=>$(x).textContent='0');
-  $('digit').textContent='—';$('matchpct').textContent='—';$('diffpct').textContent='—';
-  $('dist').textContent='No ticks yet.';$('recent').textContent='—';
-  $('signal').textContent='WAITING FOR TICKS';$('signal').className='signal neutral';
-}
-function send(o){ if(ws && ws.readyState===1) ws.send(JSON.stringify(o)); }
-function connect(){
-  manual=false; reconnects=0; clearTimeout(timer);
-  if(ws) try{ws.close()}catch(e){}
-  reset();
-  setStatus('Connecting…','warn');
-  if($('diagnostic')) $('diagnostic').textContent='Opening Deriv public market-data connection…';
-
-  try{ws=new WebSocket(WS_URL)}
-  catch(e){setStatus('WebSocket unavailable','');if($('diagnostic'))$('diagnostic').textContent=e.message||'WebSocket error';scheduleReconnect();return}
-
-  ws.onopen=()=>{
-    reconnects=0;
-    setStatus('Connected — finding symbol…','ok');
-    if($('diagnostic'))$('diagnostic').textContent='Connected. Finding Volatility 50 symbol…';
-    send({active_symbols:'brief',product_type:'basic',req_id:1});
-  };
-
-  ws.onmessage=ev=>{
-    let d;try{d=JSON.parse(ev.data)}catch(e){return}
-
-    if(d.error){
-      if($('diagnostic'))$('diagnostic').textContent='API: '+(d.error.message||'request rejected');
-      return;
-    }
-
-    if(d.msg_type==='active_symbols' && Array.isArray(d.active_symbols)){
-      const requested=$('symbol').value;
-      let found=null;
-
-      if(requested && requested!=='auto'){
-        found=d.active_symbols.find(x=>x.symbol===requested);
-      }else{
-        found=d.active_symbols.find(x=>x.symbol==='R_50') ||
-              d.active_symbols.find(x=>String(x.display_name||'').toLowerCase().includes('volatility 50 index'));
-      }
-
-      if(!found){
-        setStatus('Symbol unavailable','');
-        if($('diagnostic'))$('diagnostic').textContent='Volatility 50 is not in the symbols returned by Deriv.';
-        return;
-      }
-
-      currentSymbol=found.symbol;
-      setStatus('Connected — '+currentSymbol,'ok');
-      if($('diagnostic'))$('diagnostic').textContent='Symbol found: '+(found.display_name||currentSymbol);
-
-      const count=Math.max(100,Number($('window').value));
-      send({ticks_history:currentSymbol,end:'latest',count,style:'ticks',req_id:2});
-      send({ticks:currentSymbol,subscribe:1,req_id:3});
-      return;
-    }
-
-    if(d.msg_type==='history' && d.history && Array.isArray(d.history.prices)){
-      historyDigits=d.history.prices
-        .map(q=>digitFromQuoteWithPip(q,d.history.pip_size))
-        .filter(Number.isFinite)
-        .slice(-250);
-      $('history').textContent=historyDigits.length;
-      update();
-    }
-
-    if(d.msg_type==='tick' && d.tick){
-      const dig=digitFromQuoteWithPip(d.tick.quote,d.tick.pip_size);
-      if(!Number.isFinite(dig))return;
-      liveTicks++;
-      historyDigits.push(dig);
-      if(historyDigits.length>250)historyDigits.shift();
-      $('ticks').textContent=liveTicks;
-      $('history').textContent=historyDigits.length;
-      $('digit').textContent=dig;
-      update();
-      setStatus('Live — '+currentSymbol,'ok');
-    }
-  };
-
-  ws.onerror=()=>{
-    if(!manual){
-      setStatus('Network/WebSocket error','');
-      if($('diagnostic'))$('diagnostic').textContent='Browser/network blocked the WebSocket. Retrying…';
-    }
-  };
-
-  ws.onclose=()=>{
-    if(manual){setStatus('Disconnected');return}
-    setStatus('Disconnected — retrying…');
-    scheduleReconnect();
-  };
-}
-
-function scheduleReconnect(){
-  clearTimeout(timer);
-  reconnects=Math.min(reconnects+1,20);
-  const wait=Math.min(30000,1000*Math.pow(1.5,reconnects-1));
-  timer=setTimeout(connect,wait);
-}
-function stats(a,t){
-  const n=a.length,m=a.filter(x=>x===t).length,p=n?m/n:0,b=.10;
-  const sd=n?Math.sqrt(b*(1-b)/n):0;
-  return {n,m,p,z:sd?(p-b)/sd:0,dev:(p-b)*100};
-}
-function update(){
-  const target=Number($('target').value), win=Number($('window').value);
-  const arr=historyDigits.slice(-win);
-  $('targetView').textContent=target;
-  if(arr.length<10){$('signal').textContent='COLLECTING DATA';$('signal').className='signal neutral';return;}
-
-  const st=stats(arr,target);
-  $('matches').textContent=st.m;
-  $('matchpct').textContent=(st.p*100).toFixed(1)+'%';
-  $('observed').textContent=(st.p*100).toFixed(1)+'%';
-  $('deviation').textContent=(st.dev>=0?'+':'')+st.dev.toFixed(1)+' pp';
-
-  const sizes=[25,50,100].filter(n=>historyDigits.length>=n);
-  let agree=0, html='';
-  sizes.forEach(n=>{
-    const x=stats(historyDigits.slice(-n),target);
-    const unusual=Math.abs(x.z)>=1.5;
-    if(unusual) agree++;
-    const cls=x.z>=1.5?'good':x.z<=-1.5?'bad':'muted';
-    const label=x.z>=1.5?'above 10%':x.z<=-1.5?'below 10%':'near 10%';
-    html+=`<div class="wrow"><b>${n} ticks</b><span>${x.m}/${n} = ${(x.p*100).toFixed(1)}%</span><span class="${cls}">${label}</span></div>`;
-  });
-  $('windows').innerHTML=html||'Waiting for enough ticks…';
-  $('agreement').textContent=sizes.length?`${agree}/${sizes.length}`:'—';
-
-  let c=Array(10).fill(0);arr.forEach(d=>c[d]++);
-  const max=Math.max(...c,1);
-  $('allDist').innerHTML=c.map((n,i)=>{
-    const pct=n/arr.length*100;
-    return `<div><b>${i}</b> &nbsp; ${n} (${pct.toFixed(1)}%)<div class="bar"><span style="display:block;width:${(n/max*100).toFixed(0)}%;height:100%"></span></div></div>`;
-  }).join('');
-
-  let sig='NO CLEAR SETUP',cls='neutral';
-  if(sizes.length>=3 && st.z>=2 && agree>=2){sig='MATCH ANOMALY';cls='match';}
-  else if(sizes.length>=3 && st.z<=-2 && agree>=2){sig='DIFFER ANOMALY';cls='diff';}
-  else if(Math.abs(st.z)>=1.5){sig='WEAK ANOMALY — WAIT';}
-  else if(sizes.length<3){sig='COLLECTING 25 / 50 / 100';}
-
-  $('signal').textContent=sig;
-  $('signal').className='signal '+cls;
-  $('explain').textContent=`Target ${target}: ${st.m}/${st.n} matches. One digit has a ~10% baseline. Deviation ${st.dev>=0?'+':''}${st.dev.toFixed(1)} percentage points; z-score ${st.z.toFixed(2)}. Agreement ${agree}/${sizes.length||0}. This is statistical context, not a guaranteed next-tick prediction.`;
-  $('recent').textContent=historyDigits.slice(-60).join(' ');
-}
-$('connect').onclick=connect;
-$('disconnect').onclick=()=>{manual=true;clearTimeout(timer);if(ws)ws.close();setStatus('Disconnected');};
-$('window').onchange=update;$('target').onchange=update;$('symbol').onchange=()=>{if(ws&&ws.readyState===1)connect()};
-</script>
-</body>
-</html>
+for(let i=0;i<10;i++){let o=document.createElement('option');o.value=i;o.textContent=i;$('target').appendChild(o)}$('target').value=0;
+function stat(s,c=''){status.textContent=s;dot.className='dot '+c}
+function diag(s){$('diagnostic').textContent=s}
+function dig(q,p){let n=Number(q);if(!Number.isFinite(n))return NaN;if(Number.isFinite(Number(p))){let s=n.toFixed(Math.max(0,Math.min(10,Number(p))));let f=s.split('.')[1]||'';if(f)return Number(f.slice(-1))}let s=String(q),f=s.split('.')[1]||'';return f?Number(f.slice(-1)):Number(s.slice(-1))}
+function reset(){historyDigits=[];liveTicks=0;['ticks','matches','differs'].forEach(x=>$(x).textContent=0);digit.textContent='—';matchpct.textContent='—';diffpct.textContent='—';observed.textContent='—';deviation.textContent='—';agreement.textContent='—';windows.textContent='Waiting…';allDist.textContent='Waiting…';recent.textContent='—';signal.textContent='WAITING FOR TICKS';signal.className='signal'}
+function send(o){if(ws&&ws.readyState===1)ws.send(JSON.stringify(o))}
+function retry(){if(manual)return;clearTimeout(timer);reconnects=Math.min(reconnects+1,8);let w=Math.min(30000,1000*Math.pow(1.6,reconnects-1));diag('Connection lost. Retrying in '+Math.round(w/1000)+'s…');timer=setTimeout(connect,w)}
+function connect(){manual=false;clearTimeout(timer);if(ws)try{ws.close()}catch(e){}reset();currentSymbol=$('symbol').value;stat('Connecting…','warn');diag('Opening public market-data connection…');try{ws=new WebSocket(WS_URL)}catch(e){stat('WebSocket unavailable');diag(e.message||'WebSocket error');retry();return}
+ws.onopen=()=>{reconnects=0;stat('Connected — loading…','ok');diag('Connected. Loading history…');send({ticks_history:currentSymbol,end:'latest',count:250,style:'ticks',req_id:1});send({ticks:currentSymbol,subscribe:1,req_id:2})};
+ws.onmessage=e=>{let d;try{d=JSON.parse(e.data)}catch(x){return}if(d.error){diag('Deriv API error: '+(d.error.message||'Request rejected'));return}
+if(d.msg_type==='history'&&d.history&&Array.isArray(d.history.prices)){historyDigits=d.history.prices.map(q=>dig(q,d.pip_size)).filter(Number.isFinite).slice(-250);diag('History loaded: '+historyDigits.length+' ticks.');update()}
+if(d.msg_type==='tick'&&d.tick){let x=dig(d.tick.quote,d.tick.pip_size);if(!Number.isFinite(x))return;liveTicks++;historyDigits.push(x);if(historyDigits.length>250)historyDigits.shift();ticks.textContent=liveTicks;digit.textContent=x;stat('Live — '+currentSymbol,'ok');update()}};
+ws.onerror=()=>{if(!manual){stat('WebSocket error');diag('Browser/network rejected WebSocket. Retrying…')}};
+ws.onclose=()=>{if(manual){stat('Disconnected');diag('Disconnected by user.')}else{stat('Disconnected — retrying…');retry()}}}
+function stats(a,t){let n=a.length,m=a.filter(x=>x===t).length,p=n?m/n:0,b=.1,sd=n?Math.sqrt(b*(1-b)/n):0;return{n,m,p,z:sd?(p-b)/sd:0,dev:(p-b)*100}}
+function update(){let t=Number(target.value),w=Number($('window').value),a=historyDigits.slice(-w);if(a.length<10){signal.textContent='COLLECTING DATA';return}let s=stats(a,t),df=s.n-s.m;matches.textContent=s.m;differs.textContent=df;matchpct.textContent=(s.p*100).toFixed(1)+'%';diffpct.textContent=(df/s.n*100).toFixed(1)+'%';observed.textContent=(s.p*100).toFixed(1)+'%';deviation.textContent=(s.dev>=0?'+':'')+s.dev.toFixed(1)+' pp';
+let sizes=[25,50,100].filter(n=>historyDigits.length>=n),ag=0,h='';sizes.forEach(n=>{let x=stats(historyDigits.slice(-n),t);if(Math.abs(x.z)>=1.5)ag++;let c=x.z>=1.5?'good':x.z<=-1.5?'bad':'muted';h+=`<div class="row"><b>${n} ticks</b><span>${x.m}/${n} = ${(x.p*100).toFixed(1)}%</span><span class="${c}">${x.z>=1.5?'above':x.z<=-1.5?'below':'near'} 10%</span></div>`});windows.innerHTML=h||'Waiting…';agreement.textContent=sizes.length?ag+'/'+sizes.length:'—';
+let c=Array(10).fill(0);a.forEach(d=>c[d]++);let mx=Math.max(...c,1);allDist.innerHTML=c.map((n,i)=>`<div style="margin:7px 0"><b>${i}</b> ${n} (${(n/a.length*100).toFixed(1)}%)<div class="bar"><span style="width:${n/mx*100}%"></span></div></div>`).join('');
+let sig='NO CLEAR SETUP',cl='';if(sizes.length>=3&&s.z>=2&&ag>=2){sig='MATCH ANOMALY';cl='match'}else if(sizes.length>=3&&s.z<=-2&&ag>=2){sig='DIFFER ANOMALY';cl='diff'}else if(Math.abs(s.z)>=1.5)sig='WEAK ANOMALY — WAIT';signal.textContent=sig;signal.className='signal '+cl;explain.textContent=`Target ${t}: ${s.m}/${s.n} matches, ${df}/${s.n} differs. Baseline 10%. Deviation ${s.dev>=0?'+':''}${s.dev.toFixed(1)} pp; z-score ${s.z.toFixed(2)}; agreement ${ag}/${sizes.length||0}. Not a guarantee.`;recent.textContent=historyDigits.slice(-60).join(' ')}
+connect.onclick=connect;disconnect.onclick=()=>{manual=true;clearTimeout(timer);if(ws)try{ws.close()}catch(e){}stat('Disconnected');diag('Disconnected by user.')};$('window').onchange=update;target.onchange=update;symbol.onchange=()=>{if(ws&&ws.readyState===1)connect();else currentSymbol=symbol.value};
+</script></body></html>
